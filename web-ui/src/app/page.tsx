@@ -23,6 +23,7 @@ export default function Home() {
   const [status, setStatus] = useState<"idle" | "uploading" | "processing" | "done" | "error">("idle");
   const [resultFile, setResultFile] = useState<string | null>(null);
   const [showViewer, setShowViewer] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<"sharp" | "sam3d">("sharp");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +46,11 @@ export default function Home() {
     formData.append("image", file);
 
     try {
-      const response = await fetch("http://localhost:3001/api/predict", {
+      const endpoint = selectedModel === "sharp"
+        ? "http://localhost:3001/api/predict"
+        : "http://localhost:3001/api/predict-sam3d";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         body: formData,
       });
@@ -53,6 +58,21 @@ export default function Home() {
       if (!response.ok) throw new Error("Prediction failed");
 
       const data = await response.json();
+
+      // Handle SAM 3D unavailability
+      if (response.status === 503 && selectedModel === "sam3d") {
+        alert(
+          `SAM 3D requires using Meta's official demo:\n\n` +
+          `1. Visit: https://aidemos.meta.com/segment-anything/editor/convert-image-to-3d\n` +
+          `2. Upload your image\n` +
+          `3. Download the .ply file\n` +
+          `4. Place it in web-ui/outputs/ to view here\n\n` +
+          `Or use SHARP (Fast) for instant local generation!`
+        );
+        setStatus("idle");
+        return;
+      }
+
       setStatus("processing");
 
       setResultFile(data.filename);
@@ -109,6 +129,42 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-8">
+              {/* Model Selector */}
+              <div className="flex gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
+                <button
+                  onClick={() => setSelectedModel("sharp")}
+                  className={`flex-1 p-4 rounded-xl transition-all ${selectedModel === "sharp"
+                    ? "bg-blue-600 border-2 border-blue-400"
+                    : "bg-white/5 border-2 border-transparent hover:border-white/20"
+                    }`}
+                >
+                  <div className="text-left">
+                    <h4 className="font-bold text-lg mb-1">SHARP (Fast)</h4>
+                    <p className="text-xs text-gray-400 mb-2">2.5D View Synthesis</p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded">~1s</span>
+                      <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded">Quality: ⭐⭐⭐</span>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setSelectedModel("sam3d")}
+                  className={`flex-1 p-4 rounded-xl transition-all ${selectedModel === "sam3d"
+                    ? "bg-purple-600 border-2 border-purple-400"
+                    : "bg-white/5 border-2 border-transparent hover:border-white/20"
+                    }`}
+                >
+                  <div className="text-left">
+                    <h4 className="font-bold text-lg mb-1">SAM 3D (Premium)</h4>
+                    <p className="text-xs text-gray-400 mb-2">Full 360° Reconstruction</p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded">~30s</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded">Quality: ⭐⭐⭐⭐⭐</span>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
               {/* Action Bar */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-6">
                 <div className="flex items-center gap-4">
@@ -187,7 +243,9 @@ export default function Home() {
                         <Loader2 className="w-full h-full animate-spin text-blue-500 relative" />
                       </div>
                       <p className="text-2xl font-black text-white uppercase tracking-tighter italic">Processing AI Model</p>
-                      <p className="text-gray-400 font-medium">Estimated time: ~1.2 seconds</p>
+                      <p className="text-gray-400 font-medium">
+                        Estimated time: {selectedModel === "sharp" ? "~1 second" : "~30 seconds"}
+                      </p>
                     </div>
                   </div>
                 )}

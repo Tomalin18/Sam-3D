@@ -76,6 +76,26 @@ app.post('/api/predict', upload.single('image'), (req, res) => {
     });
 });
 
+// SAM 3D Objects API endpoint (redirects to Meta's demo)
+app.post('/api/predict-sam3d', upload.single('image'), async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
+
+    // SAM 3D Objects doesn't have a public Gradio Space API
+    // Users need to use Meta's official demo
+    res.status(503).json({
+        error: 'SAM 3D API not available',
+        message: 'SAM 3D Objects requires using Meta\'s official demo',
+        instructions: {
+            step1: 'Visit https://aidemos.meta.com/segment-anything/editor/convert-image-to-3d',
+            step2: 'Upload your image',
+            step3: 'Download the generated 3D model',
+            step4: 'Place the .ply file in web-ui/outputs/ to view here'
+        },
+        alternative: 'Use SHARP (Fast) model for quick local generation',
+        uploadedFile: req.file.filename
+    });
+});
+
 app.get('/api/download/:folder/:file', (req, res) => {
     const filePath = path.join(outputDir, req.params.folder, req.params.file);
     if (fs.existsSync(filePath)) {
@@ -88,4 +108,6 @@ app.get('/api/download/:folder/:file', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Backend server running at http://localhost:${port}`);
+    console.log(`SHARP API: http://localhost:${port}/api/predict`);
+    console.log(`SAM 3D API: http://localhost:${port}/api/predict-sam3d`);
 });

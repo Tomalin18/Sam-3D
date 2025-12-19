@@ -80,27 +80,21 @@ npm run dev
 
 適用於需要完整 360° 模型的場景。
 
-#### 1. 準備工作
+#### 使用 Meta 官方 Demo
 
-1. 註冊 [Hugging Face](https://huggingface.co/) 帳號
-2. 建立 [Access Token](https://huggingface.co/settings/tokens)
-3. 申請 [SAM 3D Objects](https://huggingface.co/facebook/sam-3d-objects) 權限
-
-#### 2. 執行 Colab
-
-1. 開啟 [Google Colab](https://colab.research.google.com/)
-2. 上傳 `colab/SAM3D_Colab.ipynb`
-3. 設定 GPU：執行階段 → 變更執行階段類型 → T4 GPU
-4. 依序執行所有 Cell
-5. 下載生成的 .ply 檔案
-
-#### 3. 本地查看
-
-將下載的 .ply 檔案放到 `web-ui/outputs/` 目錄，然後：
-- 重新整理 http://localhost:3000
-- 或上傳到 [PlayCanvas SuperSplat](https://playcanvas.com/supersplat/editor)
+1. **在 Web UI 上傳圖片**（可選，用於快速預覽）
+2. **前往 Meta 的 SAM 3D Demo**：
+   - 訪問：https://aidemos.meta.com/segment-anything/editor/convert-image-to-3d
+3. **上傳相同的圖片**
+4. **下載生成的 .ply 檔案**
+5. **本地查看**：
+   - 將 .ply 檔案放到 `web-ui/outputs/your-image-name/` 目錄
+   - 重新整理 http://localhost:3000
+   - 或上傳到 [PlayCanvas SuperSplat](https://playcanvas.com/supersplat/editor)
 
 **優點**：完整的 360° 模型，可以從任意角度查看，包含完整的背面。
+
+**注意**：SAM 3D Objects 目前沒有公開的 API，需要使用 Meta 的官方 demo。
 
 ---
 

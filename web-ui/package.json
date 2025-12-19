@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@gradio/client": "^2.0.0",
     "@mkkellogg/gaussian-splats-3d": "^0.4.7",
     "@types/busboy": "^1.5.4",
     "@types/cors": "^2.8.19",
