@@ -164,3 +164,5 @@ cython_debug/
 .DS_STORE
 *.pt
 .aider*
+web-ui/outputs/
+web-ui/uploads/
